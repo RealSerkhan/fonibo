@@ -45,44 +45,50 @@ class _HomePageState extends State<HomePage> {
           color: "#0176E1".toColor(),
         ),
       ),
-      body: SafeArea(
-        child: Container(
-          height: _size.height,
-          width: _size.width,
-          child: Padding(
-            padding: EdgeInsets.all(_size.width * 0.04),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                appBar(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: _size.height * 0.025),
-                  child: Text(
-                    "Tasks",
-                    style: TextStyle(
-                        color: "#333232".toColor(),
-                        fontSize: 16,
-                        fontFamily: "RobotoMed",
-                        fontWeight: FontWeight.w500),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          return refreshData();
+        },
+        child: SafeArea(
+          child: Container(
+            height: _size.height,
+            width: _size.width,
+            child: Padding(
+              padding: EdgeInsets.all(_size.width * 0.04),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  appBar(),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: _size.height * 0.025),
+                    child: Text(
+                      "Tasks",
+                      style: TextStyle(
+                          color: "#333232".toColor(),
+                          fontSize: 16,
+                          fontFamily: "RobotoMed",
+                          fontWeight: FontWeight.w500),
+                    ),
                   ),
-                ),
-                BlocBuilder<FoniboBloc, FoniboState>(
-                  builder: (context, state) {
-                    if (state is FoniboLoadingState) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (state is FoniboLoadedState) {
-                      return ListView(
-                          shrinkWrap: true,
-                          children: state.foniboList
-                              .mapIndexed((currentValue, index) =>
-                                  listContainer(index, currentValue))
-                              .toList());
-                    } else {
-                      return Text("error");
-                    }
-                  },
-                )
-              ],
+                  BlocBuilder<FoniboBloc, FoniboState>(
+                    builder: (context, state) {
+                      if (state is FoniboLoadingState) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (state is FoniboLoadedState) {
+                        return ListView(
+                            shrinkWrap: true,
+                            children: state.foniboList
+                                .mapIndexed((currentValue, index) =>
+                                    listContainer(index, currentValue))
+                                .toList());
+                      } else {
+                        return Text("error");
+                      }
+                    },
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -210,5 +216,9 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Future<void> refreshData() async {
+    await context.read<FoniboBloc>().add(RefresFoniboData());
   }
 }

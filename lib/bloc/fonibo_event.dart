@@ -5,7 +5,14 @@ abstract class FoniboEvent extends Equatable {
 }
 
 class FetchFoniboData extends FoniboEvent {
-  FetchFoniboData();
+  FetchFoniboData() : super();
+  @override
+  // TODO: implement props
+  List<Object> get props => throw UnimplementedError();
+}
+
+class RefresFoniboData extends FoniboEvent {
+  RefresFoniboData() : super();
   @override
   // TODO: implement props
   List<Object> get props => throw UnimplementedError();

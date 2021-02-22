@@ -23,6 +23,11 @@ class FoniboBloc extends Bloc<FoniboEvent, FoniboState> {
       try {
         yield FoniboLoadedState(foniboList: await _repository.getData());
       } catch (_) {}
+    } else if (event is RefresFoniboData) {
+      yield FoniboLoadingState();
+      try {
+        yield FoniboLoadedState(foniboList: await _repository.getData());
+      } catch (_) {}
     }
     // TODO: implement mapEventToState
   }
