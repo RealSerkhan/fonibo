@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fonibo/bloc/fonibo_bloc.dart';
+import 'package:fonibo/get_it/locator.dart';
 
 import 'home.dart';
 
 void main() {
+  setupLocator();
   runApp(MyApp());
 }
 
@@ -28,7 +32,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: BlocProvider(create: (context) => FoniboBloc(), child: HomePage()),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fonibo/back/controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fonibo/back/fonibo_api.dart';
+import 'package:fonibo/bloc/fonibo_bloc.dart';
 import 'package:fonibo/models/Fonibo.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -11,30 +13,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Size _size;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  Controller _controller;
+  FoniboApi _controller;
   List<Color> _colors = [
     "#FFDEDE".toColor(),
     "#5BB1FF".toColor().withOpacity(0.35),
     "#B1F8C1".toColor(),
     "#FEDEFF".toColor()
   ];
-  // Map<Color, Information> listMap = {
-  //   "#FFDEDE".toColor(): new Information("title", "createdAt"),
-  //   "#5BB1FF".toColor().withOpacity(0.35):
-  //       new Information("title", "createdAt"),
-  //   "#B1F8C1".toColor(): new Information("title", "createdAt"),
-  //   "#FEDEFF".toColor(): new Information("title", "createdAt"),
-  // };
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = Controller();
+    _controller = FoniboApi();
   }
 
   @override
   Widget build(BuildContext context) {
+    final foniboBloc = BlocProvider.of<FoniboBloc>(context);
+    foniboBloc.add(FetchFoniboData());
     _size = MediaQuery.of(context).size;
     return Scaffold(
       key: _scaffoldKey,
@@ -69,18 +66,19 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.w500),
                   ),
                 ),
-                FutureBuilder<List<Fonibo>>(
-                  future: _controller.getFormList(),
-                  builder: (context, AsyncSnapshot<List<Fonibo>> snapshot) {
-                    if (snapshot.hasData) {
+                BlocBuilder<FoniboBloc, FoniboState>(
+                  builder: (context, state) {
+                    if (state is FoniboLoadingState) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (state is FoniboLoadedState) {
                       return ListView(
                           shrinkWrap: true,
-                          children: snapshot.data
+                          children: state.foniboList
                               .mapIndexed((currentValue, index) =>
                                   listContainer(index, currentValue))
                               .toList());
                     } else {
-                      return Center(child: CircularProgressIndicator());
+                      return Text("error");
                     }
                   },
                 )
@@ -91,6 +89,22 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  //
+  // FutureBuilder<List<Fonibo>>(
+  // future: _controller.getData(),
+  // builder: (context, AsyncSnapshot<List<Fonibo>> snapshot) {
+  // if (snapshot.hasData) {
+  // return ListView(
+  // shrinkWrap: true,
+  // children: snapshot.data
+  //     .mapIndexed((currentValue, index) =>
+  // listContainer(index, currentValue))
+  //     .toList());
+  // } else {
+  // return Center(child: CircularProgressIndicator());
+  // }
+  // },
+  // )
 
   Container listContainer(index, Fonibo fonibo) {
     List<String> split = fonibo.createdAt.split("-");
